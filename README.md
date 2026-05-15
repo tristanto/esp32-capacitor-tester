@@ -1,4 +1,3 @@
-# esp32-capacitor-tester
 # ESP32 Capacitor Leakage Tester
 
 Capacitor leakage current tester using ESP32.
