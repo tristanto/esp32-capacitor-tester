@@ -14,11 +14,15 @@
 
 #include "sdkconfig.h"
 
-
+void task_read_adc(void *pvParameters) {
+    while(1) {
+        ESP_LOGI("ADC", "Reading ADC value... ");
+        vTaskDelay(pdMS_TO_TICKS(100)); 
+    }
+}
 
 void app_main(void)
 {
-    while (1) {
-        vTaskDelay(CONFIG_BLINK_PERIOD / portTICK_PERIOD_MS);
-    }
+    xTaskCreate(task_read_adc, "ADC Reader", 2048, NULL, 10, NULL);
+    
 }
