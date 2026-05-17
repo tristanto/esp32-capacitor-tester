@@ -7,12 +7,13 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 #include <stdio.h>
+#include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "driver/gpio.h"
+//#include "driver/gpio.h"
 #include "esp_log.h"
+#include "esp_adc/adc_continuous.h"
 
-#include "sdkconfig.h"
 
 void task_read_adc(void *pvParameters) {
     while(1) {

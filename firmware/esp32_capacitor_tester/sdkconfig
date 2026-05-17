@@ -706,27 +706,6 @@ CONFIG_PARTITION_TABLE_MD5=y
 # end of Partition Table
 
 #
-# Example Configuration
-#
-# default:
-CONFIG_ENV_GPIO_RANGE_MIN=0
-# default:
-CONFIG_ENV_GPIO_RANGE_MAX=39
-# default:
-CONFIG_ENV_GPIO_IN_RANGE_MAX=39
-# default:
-CONFIG_ENV_GPIO_OUT_RANGE_MAX=33
-# default:
-CONFIG_BLINK_LED_GPIO=y
-# default:
-# CONFIG_BLINK_LED_STRIP is not set
-# default:
-CONFIG_BLINK_GPIO=8
-# default:
-CONFIG_BLINK_PERIOD=1000
-# end of Example Configuration
-
-#
 # Compiler options
 #
 # default:
@@ -818,6 +797,40 @@ CONFIG_COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE=y
 #
 
 #
+# Legacy Driver Configurations
+#
+
+#
+# Legacy TWAI Driver Configurations
+#
+# default:
+# CONFIG_TWAI_ISR_IN_IRAM_LEGACY is not set
+# default:
+# CONFIG_TWAI_SUPPRESS_DEPRECATE_WARN is not set
+# default:
+# CONFIG_TWAI_SKIP_LEGACY_CONFLICT_CHECK is not set
+# end of Legacy TWAI Driver Configurations
+
+#
+# Legacy I2C Driver Configurations
+#
+# default:
+# CONFIG_I2C_SUPPRESS_DEPRECATE_WARN is not set
+# default:
+# CONFIG_I2C_SKIP_LEGACY_CONFLICT_CHECK is not set
+# end of Legacy I2C Driver Configurations
+
+#
+# Legacy Touch Sensor Driver Configurations
+#
+# default:
+# CONFIG_TOUCH_SUPPRESS_DEPRECATE_WARN is not set
+# default:
+# CONFIG_TOUCH_SKIP_LEGACY_CONFLICT_CHECK is not set
+# end of Legacy Touch Sensor Driver Configurations
+# end of Legacy Driver Configurations
+
+#
 # eFuse Bit Manager
 #
 # default:
@@ -835,6 +848,31 @@ CONFIG_EFUSE_MAX_BLK_LEN=192
 # end of eFuse Bit Manager
 
 #
+# ADC and ADC Calibration
+#
+# default:
+# CONFIG_ADC_ONESHOT_CTRL_FUNC_IN_IRAM is not set
+# default:
+# CONFIG_ADC_CONTINUOUS_ISR_IRAM_SAFE is not set
+
+#
+# ADC Calibration Configurations
+#
+# default:
+CONFIG_ADC_CALI_EFUSE_TP_ENABLE=y
+# default:
+CONFIG_ADC_CALI_EFUSE_VREF_ENABLE=y
+# default:
+CONFIG_ADC_CALI_LUT_ENABLE=y
+# end of ADC Calibration Configurations
+
+# default:
+CONFIG_ADC_DISABLE_DAC_OUTPUT=y
+# default:
+# CONFIG_ADC_ENABLE_DEBUG_LOG is not set
+# end of ADC and ADC Calibration
+
+#
 # Common ESP-related
 #
 # default:
@@ -847,6 +885,17 @@ CONFIG_ESP_ERR_TO_NAME_LOOKUP=y
 # default:
 # CONFIG_GPIO_CTRL_FUNC_IN_IRAM is not set
 # end of ESP-Driver:GPIO Configurations
+
+#
+# ESP-Driver:I2S Configurations
+#
+# default:
+# CONFIG_I2S_ISR_IRAM_SAFE is not set
+# default:
+# CONFIG_I2S_CTRL_FUNC_IN_IRAM is not set
+# default:
+# CONFIG_I2S_ENABLE_DEBUG_LOG is not set
+# end of ESP-Driver:I2S Configurations
 
 #
 # Hardware Settings
@@ -1067,6 +1116,15 @@ CONFIG_LIBC_ASSERT_BUFFER_SIZE=200
 # default:
 # CONFIG_PM_SLP_IRAM_OPT is not set
 # end of Power Management
+
+#
+# ESP Ringbuf
+#
+# default:
+# CONFIG_RINGBUF_IN_IRAM is not set
+# default:
+# CONFIG_RINGBUF_PLACE_ISR_FUNCTIONS_INTO_FLASH is not set
+# end of ESP Ringbuf
 
 #
 # ESP-ROM
@@ -1994,6 +2052,10 @@ CONFIG_STACK_CHECK_NONE=y
 # CONFIG_STACK_CHECK_STRONG is not set
 # CONFIG_STACK_CHECK_ALL is not set
 # CONFIG_WARN_WRITE_STRINGS is not set
+CONFIG_ADC_CAL_EFUSE_TP_ENABLE=y
+CONFIG_ADC_CAL_EFUSE_VREF_ENABLE=y
+CONFIG_ADC_CAL_LUT_ENABLE=y
+CONFIG_ADC_DISABLE_DAC=y
 # CONFIG_TWO_UNIVERSAL_MAC_ADDRESS is not set
 CONFIG_FOUR_UNIVERSAL_MAC_ADDRESS=y
 CONFIG_NUMBER_OF_UNIVERSAL_MAC_ADDRESS=4
