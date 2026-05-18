@@ -32,6 +32,7 @@ Capacitor leakage current testing is important to evaluate the insulation qualit
 - [ ] Design current sensing stage
 - [ ] Prototype leakage test fixture
 
+
 ### Software Tools
 - [ ] Develop Python serial logger
 - [ ] Export measurement data to CSV
