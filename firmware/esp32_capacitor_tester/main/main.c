@@ -22,6 +22,22 @@
 #define READ_LEN            256
 
 
+volatile uint32_t timestamp_start = 0;
+volatile uint32_t timestamp_end = 0;
+volatile bool capture_done = false;
+
+
+static bool IRAM_ATTR on_capture_reached(mcpwm_cap_channel_handle_t cap_chan, const mcpwm_capture_event_data_t *edata, void *user_data) {
+    // Di v6.0, disarankan menggunakan struktur mcpwm_capture_event_data_t baku
+    timestamp_end = edata->cap_value; 
+    capture_done = true;
+    
+    // Kembalikan false karena kita tidak membangunkan task prioritas tinggi di dalam ISR ini
+    return false; 
+}
+
+
+
 static adc_channel_t channel[2] = {ADC_CHANNEL_6, ADC_CHANNEL_7};
 /*TODO: Implement ADC continuous initialization*/
 static void adc_continuous_init(adc_continuous_handle_t *handle) {
