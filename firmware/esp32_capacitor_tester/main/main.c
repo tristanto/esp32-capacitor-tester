@@ -13,6 +13,7 @@
 //#include "driver/gpio.h"
 #include "esp_log.h"
 #include "esp_adc/adc_continuous.h"
+#include "driver/mcpwm_cap.h" 
 
 //ADC configuration parameters
 #define ADC_UNIT            ADC_UNIT_1
@@ -71,6 +72,6 @@ void app_main(void)
     while(1) {
         vTaskDelay(pdMS_TO_TICKS(1000)); // Main task can perform other operations or sleep
     }
-    
+
     
 }
