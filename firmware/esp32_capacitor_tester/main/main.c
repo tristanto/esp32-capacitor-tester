@@ -22,7 +22,7 @@
 
 
 static adc_channel_t channel[2] = {ADC_CHANNEL_6, ADC_CHANNEL_7};
-
+/*TODO: Implement ADC continuous initialization*/
 static void adc_continuous_init(adc_continuous_handle_t *handle) {
     adc_continuous_handle_cfg_t adc_config = {
         .max_store_buf_size = READ_LEN,
@@ -54,7 +54,6 @@ static void adc_continuous_init(adc_continuous_handle_t *handle) {
     adc_continuous_config.pattern_num = 2;
     adc_continuous_config.adc_pattern = adc_pattern;
 
-    
 }
 
 void task_read_adc(void *pvParameters) {
@@ -66,6 +65,12 @@ void task_read_adc(void *pvParameters) {
 
 void app_main(void)
 {
+    adc_continuous_handle_t adc_handle;
+    adc_continuous_init(&adc_handle);
     xTaskCreate(task_read_adc, "ADC Reader", 2048, NULL, 10, NULL);
+    while(1) {
+        vTaskDelay(pdMS_TO_TICKS(1000)); // Main task can perform other operations or sleep
+    }
+    
     
 }
