@@ -4,7 +4,7 @@
   "idf.openOcdConfigs": [
     "board/esp32-wrover-kit-3.3v.cfg"
   ],
-  "idf.port": "detect",
+  "idf.port": "/dev/ttyACM0",
   "idf.currentSetup": "/home/tristanto/.espressif_/v6.0.1/esp-idf",
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32"
@@ -15,5 +15,6 @@
     "--query-driver=**",
     "--compile-commands-dir=/home/tristanto/github_project/esp32-capacitor-tester/firmware/esp32_capacitor_tester/build"
   ],
-  "C_Cpp.default.compilerPath": "/home/tristanto/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin/xtensa-esp32-elf-gcc"
+  "C_Cpp.default.compilerPath": "/home/tristanto/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin/xtensa-esp32-elf-gcc",
+  "idf.flashType": "UART"
 }

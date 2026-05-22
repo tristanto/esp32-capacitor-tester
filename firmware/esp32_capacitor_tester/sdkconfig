@@ -913,6 +913,24 @@ CONFIG_MCPWM_OBJ_CACHE_SAFE=y
 # end of ESP-Driver:MCPWM Configurations
 
 #
+# ESP-Driver:UART Configurations
+#
+# default:
+# CONFIG_UART_ISR_IN_IRAM is not set
+# end of ESP-Driver:UART Configurations
+
+#
+# ESP-Driver:UHCI Configurations
+#
+# default:
+# CONFIG_UHCI_ISR_HANDLER_IN_IRAM is not set
+# default:
+# CONFIG_UHCI_ISR_CACHE_SAFE is not set
+# default:
+# CONFIG_UHCI_ENABLE_DEBUG_LOG is not set
+# end of ESP-Driver:UHCI Configurations
+
+#
 # Hardware Settings
 #
 # default:
@@ -1131,6 +1149,13 @@ CONFIG_LIBC_ASSERT_BUFFER_SIZE=200
 # default:
 # CONFIG_PM_SLP_IRAM_OPT is not set
 # end of Power Management
+
+#
+# ESP PSRAM
+#
+# default:
+# CONFIG_SPIRAM is not set
+# end of ESP PSRAM
 
 #
 # ESP Ringbuf
@@ -2123,6 +2148,8 @@ CONFIG_ESP32_TIME_SYSCALL_USE_RTC_FRC1=y
 # CONFIG_ESP32_TIME_SYSCALL_USE_FRC1 is not set
 # CONFIG_NEWLIB_TIME_SYSCALL_USE_NONE is not set
 # CONFIG_ESP32_TIME_SYSCALL_USE_NONE is not set
+# CONFIG_SPIRAM_SUPPORT is not set
+# CONFIG_ESP32_SPIRAM_SUPPORT is not set
 CONFIG_CONSOLE_UART_DEFAULT=y
 # CONFIG_CONSOLE_UART_CUSTOM is not set
 # CONFIG_CONSOLE_UART_NONE is not set

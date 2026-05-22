@@ -14,6 +14,7 @@
 #include "esp_log.h"
 #include "esp_adc/adc_continuous.h"
 #include "driver/mcpwm_cap.h"
+#include "driver/uart.h"
 
 // ADC configuration parameters
 #define ADC_UNIT ADC_UNIT_1
@@ -28,7 +29,26 @@
 volatile uint32_t timestamp_start = 0;
 volatile uint32_t timestamp_end = 0;
 volatile bool capture_done = false;
+void uart_setup()
+{
+    // Setup UART buffered IO with event queue
+    const int uart_buffer_size = (1024 * 2);
+    QueueHandle_t uart_queue;
+    // Install UART driver using an event queue here
+    ESP_ERROR_CHECK(uart_driver_install(UART_NUM_2, uart_buffer_size, uart_buffer_size, 10, &uart_queue, 0));
 
+    const uart_port_t uart_num = UART_NUM_2;
+    uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_CTS_RTS,
+        .rx_flow_ctrl_thresh = 122,
+    };
+    // Configure UART parameters
+    ESP_ERROR_CHECK(uart_param_config(uart_num, &uart_config));
+}
 static bool IRAM_ATTR on_capture_reached(mcpwm_cap_channel_handle_t cap_chan, const mcpwm_capture_event_data_t *edata, void *user_data)
 {
 
@@ -50,7 +70,6 @@ static void start_capacitor_measurement()
     capture_done = false;
     timestamp_start = 0;
     timestamp_end = 0;
-
 }
 
 static adc_channel_t channel[2] = {ADC_CHANNEL_6, ADC_CHANNEL_7};
@@ -91,20 +110,23 @@ void task_read_adc(void *pvParameters)
 {
     while (1)
     {
-        ESP_LOGI("ADC", "Reading ADC value... ");
-        vTaskDelay(pdMS_TO_TICKS(100));
+       ESP_LOGI("ADC", "Reading ADC value... ");
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
 void app_main(void)
 {
     GPIO_charge_init();
-
+    uart_setup();
+    uint32_t count = 0;
     adc_continuous_handle_t adc_handle;
     adc_continuous_init(&adc_handle);
-    xTaskCreate(task_read_adc, "ADC Reader", 2048, NULL, 10, NULL);
+  xTaskCreate(task_read_adc, "ADC Reader", 2048, NULL, 10, NULL);
     while (1)
     {
+        ESP_LOGI("Main", "Starting measurement cycle %d", count++);
+        
         vTaskDelay(pdMS_TO_TICKS(1000)); // Main task can perform other operations or sleep
     }
 }
