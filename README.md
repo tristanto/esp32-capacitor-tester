@@ -1,4 +1,4 @@
-# ESP32 Capacitor value measurement and Leakage Tester
+# ESP32 Capacitor Value and Leakage current Tester
 
 Capacitor value and leakage current testing system using ESP32.
 
