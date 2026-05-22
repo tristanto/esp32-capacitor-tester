@@ -129,27 +129,26 @@ void measurement_setup()
     ESP_ERROR_CHECK(mcpwm_new_capture_timer(&timer_config, &cap_timer));
 
     // interupt init for capture channel
-// Konfigurasi Saluran Capture Input (Menerima sinyal dari LM393)
+    // config to receive signal from comparator output, which is connected to GPIO 19 (PIN_COMP_OUT)
     mcpwm_cap_channel_handle_t cap_chan = NULL;
     mcpwm_capture_channel_config_t chan_config = {
         .gpio_num = PIN_COMP_OUT,
         .prescale = 1,
-        .flags.pos_edge = true,  // Terpicu saat tegangan naik (Rising Edge)
+        .flags.pos_edge = true, // Triggered on rising edge, which indicates the capacitor voltage has reached the comparator threshold
 
     };
     ESP_ERROR_CHECK(mcpwm_new_capture_channel(cap_timer, &chan_config, &cap_chan));
-    // Daftarkan Event Callback
+    // Register Callback
     mcpwm_capture_event_callbacks_t cbs = {
-        .on_cap= on_capture_reached,
-        
+        .on_cap = on_capture_reached,
+
     };
     ESP_ERROR_CHECK(mcpwm_capture_channel_register_event_callbacks(cap_chan, &cbs, NULL));
 
-    // Aktifkan Hardware Timer & Channel
+    // Activate Hardware Timer & Channel
     ESP_ERROR_CHECK(mcpwm_capture_timer_enable(cap_timer));
     ESP_ERROR_CHECK(mcpwm_capture_channel_enable(cap_chan));
     ESP_ERROR_CHECK(mcpwm_capture_timer_start(cap_timer));
-
 }
 void app_main(void)
 {
@@ -158,6 +157,7 @@ void app_main(void)
     uint32_t count = 0;
     adc_continuous_handle_t adc_handle;
     adc_continuous_init(&adc_handle);
+    measurement_setup();
     xTaskCreate(task_read_adc, "ADC Reader", 2048, NULL, 10, NULL);
     while (1)
     {
