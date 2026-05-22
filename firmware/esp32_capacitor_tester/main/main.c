@@ -16,6 +16,7 @@
 #include "driver/mcpwm_cap.h"
 #include "driver/uart.h"
 
+static const char *TAG = "CAP_METER_V1.0";
 // ADC configuration parameters
 #define ADC_UNIT ADC_UNIT_1
 #define ADC_CHANNEL ADC_CHANNEL_3 // ADC1_CH3 is physically GPIO 4 in ESP32
@@ -110,11 +111,46 @@ void task_read_adc(void *pvParameters)
 {
     while (1)
     {
-       ESP_LOGI("ADC", "Reading ADC value... ");
+        ESP_LOGI("ADC", "Reading ADC value... ");
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
+void measurement_setup()
+{
+    // GPIO init for charging the capacitor
+    gpio_reset_pin(PIN_CHARGE);
+    gpio_set_direction(PIN_CHARGE, GPIO_MODE_OUTPUT);
+    // 3. Alokasikan Modul MCPWM Capture Timer
+    mcpwm_cap_timer_handle_t cap_timer = NULL;
+    mcpwm_capture_timer_config_t timer_config = {
+        .group_id = 0,
+        .clk_src = MCPWM_CAPTURE_CLK_SRC_DEFAULT,
+    };
+    ESP_ERROR_CHECK(mcpwm_new_capture_timer(&timer_config, &cap_timer));
 
+    // interupt init for capture channel
+// Konfigurasi Saluran Capture Input (Menerima sinyal dari LM393)
+    mcpwm_cap_channel_handle_t cap_chan = NULL;
+    mcpwm_capture_channel_config_t chan_config = {
+        .gpio_num = PIN_COMP_OUT,
+        .prescale = 1,
+        .flags.pos_edge = true,  // Terpicu saat tegangan naik (Rising Edge)
+
+    };
+    ESP_ERROR_CHECK(mcpwm_new_capture_channel(cap_timer, &chan_config, &cap_chan));
+    // Daftarkan Event Callback
+    mcpwm_capture_event_callbacks_t cbs = {
+        .on_cap= on_capture_reached,
+        
+    };
+    ESP_ERROR_CHECK(mcpwm_capture_channel_register_event_callbacks(cap_chan, &cbs, NULL));
+
+    // Aktifkan Hardware Timer & Channel
+    ESP_ERROR_CHECK(mcpwm_capture_timer_enable(cap_timer));
+    ESP_ERROR_CHECK(mcpwm_capture_channel_enable(cap_chan));
+    ESP_ERROR_CHECK(mcpwm_capture_timer_start(cap_timer));
+
+}
 void app_main(void)
 {
     GPIO_charge_init();
@@ -122,11 +158,11 @@ void app_main(void)
     uint32_t count = 0;
     adc_continuous_handle_t adc_handle;
     adc_continuous_init(&adc_handle);
-  xTaskCreate(task_read_adc, "ADC Reader", 2048, NULL, 10, NULL);
+    xTaskCreate(task_read_adc, "ADC Reader", 2048, NULL, 10, NULL);
     while (1)
     {
         ESP_LOGI("Main", "Starting measurement cycle %d", count++);
-        
+
         vTaskDelay(pdMS_TO_TICKS(1000)); // Main task can perform other operations or sleep
     }
 }
