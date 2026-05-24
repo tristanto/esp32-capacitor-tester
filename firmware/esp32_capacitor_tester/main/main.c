@@ -14,6 +14,7 @@
 #include "esp_log.h"
 #include "esp_adc/adc_continuous.h"
 #include "driver/mcpwm_cap.h"
+#include "driver/mcpwm_sync.h"
 #include "driver/uart.h"
 
 static const char *TAG = "CAP_METER_V1.0";
@@ -31,7 +32,8 @@ volatile uint32_t timestamp_start = 0;
 volatile uint32_t timestamp_end = 0;
 volatile bool capture_done = false;
 uint32_t timer_resolution = 0;
-    mcpwm_cap_timer_handle_t cap_timer = NULL;
+mcpwm_cap_timer_handle_t cap_timer = NULL;
+mcpwm_sync_handle_t soft_sync_src = NULL; // to reset the timer counter to 0 at the moment we start charging the capacitor
 
 void uart_setup()
 {
@@ -71,9 +73,9 @@ static void start_capacitor_measurement()
 {
     // Reset flag dan timestamp
     capture_done = false;
-    timestamp_end = 0;
-    timestamp_start = mcpwm_capture_timer_get_value(cap_timer);
     gpio_set_level(PIN_CHARGE, 1); // Mulai mengisi kapasitor dengan memberikan level HIGH ke pin charge
+    timestamp_start = 0;
+    
 }
 
 static adc_channel_t channel[2] = {ADC_CHANNEL_6, ADC_CHANNEL_7};
@@ -123,11 +125,17 @@ void measurement_setup()
     // GPIO init for charging the capacitor
     gpio_reset_pin(PIN_CHARGE);
     gpio_set_direction(PIN_CHARGE, GPIO_MODE_OUTPUT);
+
+
+    mcpwm_soft_sync_config_t soft_sync_config = {};
+    ESP_ERROR_CHECK(mcpwm_new_soft_sync_src(&soft_sync_config, &soft_sync_src)); //
+
     // 3. Alokasikan Modul MCPWM Capture Timer
 
     mcpwm_capture_timer_config_t timer_config = {
         .group_id = 0,
         .clk_src = MCPWM_CAPTURE_CLK_SRC_DEFAULT,
+
     };
     ESP_ERROR_CHECK(mcpwm_new_capture_timer(&timer_config, &cap_timer));
 
@@ -143,7 +151,9 @@ void measurement_setup()
     ESP_ERROR_CHECK(mcpwm_new_capture_channel(cap_timer, &chan_config, &cap_chan));
     // Register Callback
     mcpwm_capture_event_callbacks_t cbs = {
-        .on_cap = on_capture_reached
+        .on_cap = on_capture_reached,
+
+        
 
     };
     ESP_ERROR_CHECK(mcpwm_capture_channel_register_event_callbacks(cap_chan, &cbs, NULL));
@@ -175,7 +185,6 @@ void app_main(void)
             // basic formula: C = t / R
             double capacitance_uf = (duration_sec / RESISTOR_VAL) * 1000000.0;
             ESP_LOGI(TAG, "Measurement %d: Capacitance = %.2f microfarads", count++, capacitance_uf);
-
             start_capacitor_measurement(); // Reset untuk pengukuran berikutnya
         }
 
