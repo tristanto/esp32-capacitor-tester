@@ -31,7 +31,8 @@ volatile uint32_t timestamp_start = 0;
 volatile uint32_t timestamp_end = 0;
 volatile bool capture_done = false;
 uint32_t timer_resolution = 0;
-    
+    mcpwm_cap_timer_handle_t cap_timer = NULL;
+
 void uart_setup()
 {
     // Setup UART buffered IO with event queue
@@ -61,7 +62,6 @@ static bool IRAM_ATTR on_capture_reached(mcpwm_cap_channel_handle_t cap_chan, co
     return false;
 }
 
-
 static void GPIO_charge_init()
 {
     gpio_reset_pin(PIN_CHARGE);
@@ -71,8 +71,9 @@ static void start_capacitor_measurement()
 {
     // Reset flag dan timestamp
     capture_done = false;
-    timestamp_start = 0;
     timestamp_end = 0;
+    timestamp_start = mcpwm_capture_timer_get_value(cap_timer);
+    gpio_set_level(PIN_CHARGE, 1); // Mulai mengisi kapasitor dengan memberikan level HIGH ke pin charge
 }
 
 static adc_channel_t channel[2] = {ADC_CHANNEL_6, ADC_CHANNEL_7};
@@ -123,7 +124,7 @@ void measurement_setup()
     gpio_reset_pin(PIN_CHARGE);
     gpio_set_direction(PIN_CHARGE, GPIO_MODE_OUTPUT);
     // 3. Alokasikan Modul MCPWM Capture Timer
-    mcpwm_cap_timer_handle_t cap_timer = NULL;
+
     mcpwm_capture_timer_config_t timer_config = {
         .group_id = 0,
         .clk_src = MCPWM_CAPTURE_CLK_SRC_DEFAULT,
@@ -167,18 +168,17 @@ void app_main(void)
         if (capture_done)
         {
 
-            // Hitung waktu yang dibutuhkan untuk pengisian kapasitor
+            // calculat the time to charge the capacitor using the captured timestamps
             uint32_t cap_charge_time_us = timestamp_end - timestamp_start; // Karena timer MCPWM sudah diatur dengan resolusi 1us
-            ESP_LOGI(TAG, "Measurement %d: Time to charge capacitor = %u microseconds", count++, cap_charge_time_us );
-            start_capacitor_measurement(); // Reset untuk pengukuran berikutnya
-
-            double duration_sec = (double )cap_charge_time_us / (double) timer_resolution; // Konversi ke detik
-           // Rumus dasar: C = t / R
+            ESP_LOGI(TAG, "Measurement %d: Time to charge capacitor = %u microseconds", count++, cap_charge_time_us);
+            double duration_sec = (double)cap_charge_time_us / (double)timer_resolution; // Konversi ke detik
+            // basic formula: C = t / R
             double capacitance_uf = (duration_sec / RESISTOR_VAL) * 1000000.0;
             ESP_LOGI(TAG, "Measurement %d: Capacitance = %.2f microfarads", count++, capacitance_uf);
+
+            start_capacitor_measurement(); // Reset untuk pengukuran berikutnya
         }
 
-        
-    taskYIELD(); // Yield to other tasks (like ADC reading task)
-    
-    }}
+        taskYIELD(); // Yield to other tasks (like ADC reading task)
+    }
+}
