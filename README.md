@@ -26,9 +26,9 @@ Capacitor leakage current testing is important to evaluate the insulation qualit
 
 ### Core Features
 - [ ] Implement ADC voltage measurement
-- [ ] Add capacitor value calculation
+- [x] Add capacitor value calculation
 - [ ] Add leakage current calculation
-- [ ] Add UART debug output
+- [x] Add UART debug output
 
 ### Hardware
 - [ ] Build voltage sensing circuit
@@ -42,6 +42,7 @@ Capacitor leakage current testing is important to evaluate the insulation qualit
 
 ### Future Improvements
 - [ ] Add OLED display
+- [ ] Add web based display
 - [ ] Add automatic calibration
 - [ ] Add PC visualization tool
 
