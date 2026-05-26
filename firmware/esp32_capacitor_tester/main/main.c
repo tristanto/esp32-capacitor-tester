@@ -75,7 +75,6 @@ static void start_capacitor_measurement()
     capture_done = false;
     gpio_set_level(PIN_CHARGE, 1); // Mulai mengisi kapasitor dengan memberikan level HIGH ke pin charge
     timestamp_start = 0;
-    
 }
 
 static adc_channel_t channel[2] = {ADC_CHANNEL_6, ADC_CHANNEL_7};
@@ -125,13 +124,10 @@ void measurement_setup()
     // GPIO init for charging the capacitor
     gpio_reset_pin(PIN_CHARGE);
     gpio_set_direction(PIN_CHARGE, GPIO_MODE_OUTPUT);
-
-
     mcpwm_soft_sync_config_t soft_sync_config = {};
     ESP_ERROR_CHECK(mcpwm_new_soft_sync_src(&soft_sync_config, &soft_sync_src)); //
 
     // 3. Alokasikan Modul MCPWM Capture Timer
-
     mcpwm_capture_timer_config_t timer_config = {
         .group_id = 0,
         .clk_src = MCPWM_CAPTURE_CLK_SRC_DEFAULT,
@@ -154,7 +150,6 @@ void measurement_setup()
         .on_cap = on_capture_reached,
     };
     ESP_ERROR_CHECK(mcpwm_capture_channel_register_event_callbacks(cap_chan, &cbs, NULL));
-
     // Activate Hardware Timer & Channel
     ESP_ERROR_CHECK(mcpwm_capture_timer_enable(cap_timer));
     ESP_ERROR_CHECK(mcpwm_capture_channel_enable(cap_chan));
