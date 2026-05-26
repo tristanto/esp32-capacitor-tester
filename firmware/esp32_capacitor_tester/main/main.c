@@ -152,9 +152,6 @@ void measurement_setup()
     // Register Callback
     mcpwm_capture_event_callbacks_t cbs = {
         .on_cap = on_capture_reached,
-
-        
-
     };
     ESP_ERROR_CHECK(mcpwm_capture_channel_register_event_callbacks(cap_chan, &cbs, NULL));
 
