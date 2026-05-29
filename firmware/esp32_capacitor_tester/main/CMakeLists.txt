@@ -1,4 +1,4 @@
-idf_component_register(SRCS "web_based_display.c" "main.c"                    
+idf_component_register(SRCS "web_based_display.c" "main.c"  "wifi_config_mgr.c"                  
                        INCLUDE_DIRS "."
                        PRIV_REQUIRES esp_adc esp_driver_mcpwm esp_driver_gpio esp_driver_uart  esp_wifi
-                       REQUIRES driver esp_http_server)
+                       REQUIRES driver esp_http_server nvs_flash)
