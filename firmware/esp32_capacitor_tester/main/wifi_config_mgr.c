@@ -45,7 +45,7 @@ void save_wifi_credentials(const char *ssid, const char *password) {
         nvs_set_blob(handle, NVS_KEY_CONFIG, &config, sizeof(wifi_stored_config_t));
         nvs_commit(handle);
         nvs_close(handle);
-        ESP_LOGI(TAG, "Kredensial Wi-Fi berhasil disimpan ke NVS.");
+        ESP_LOGI(TAG, "The credentials for Wi-Fi SSID '%s' have been saved to NVS.", ssid);
     }
 }
 void clear_wifi_credentials(void) {
@@ -54,6 +54,6 @@ void clear_wifi_credentials(void) {
         nvs_erase_key(handle, NVS_KEY_CONFIG);
         nvs_commit(handle);
         nvs_close(handle);
-        ESP_LOGW(TAG, "Kredensial Wi-Fi di NVS berhasil DIHAPUS.");
+        ESP_LOGW(TAG, "Wi-Fi credentials have been cleared from NVS.   ");
     }
 }
