@@ -81,6 +81,9 @@ Where:
 
 
 
+---
+---
+
 # Wi-Fi Configuration Manager (ESP-IDF v6.0+)
 
 A robust and production-ready Wi-Fi manager for ESP32 devices built on the **ESP-IDF v6.0** framework. It automatically handles Dual-Mode Wi-Fi switching: **Access Point (AP) Mode** for initial provisioning and **Station (STA) Mode** for normal client operation. 
