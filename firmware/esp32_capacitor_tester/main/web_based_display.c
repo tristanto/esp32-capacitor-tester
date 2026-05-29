@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <esp_http_server.h>
+
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -123,8 +124,7 @@ static esp_err_t data_stream_handler(httpd_req_t *req) {
         
         vTaskDelay(pdMS_TO_TICKS(300)); // Refresh data di layar setiap 300ms
     }
-    
-    httpd_resp_set_chunk_toclose(req);
+   
     httpd_resp_send_chunk(req, NULL, 0);
     return ESP_OK;
 }
