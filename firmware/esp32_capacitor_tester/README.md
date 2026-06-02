@@ -38,7 +38,7 @@ $$C = \frac{\tau}{R}$$
 
 ### 1.3 Schematic Diagram
 
-<img width="892" height="680" alt="{DAEABD75-1869-45BB-8C9D-1E05A484DCDB}" src="https://github.com/user-attachments/assets/b1f4d2f5-864e-4682-a477-f1276eb7b927" />
+<img width="446" height="340" alt="{DAEABD75-1869-45BB-8C9D-1E05A484DCDB}" src="https://github.com/user-attachments/assets/b1f4d2f5-864e-4682-a477-f1276eb7b927" />
 
 ---
 
