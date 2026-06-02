@@ -35,6 +35,11 @@ $$C = \frac{\tau}{R}$$
 4. **Hardware Capture:** The moment the capacitor voltage crosses $2.08\text{V}$, the comparator's output toggles from *LOW* to *HIGH*. This sharp rising edge triggers an instant hardware interrupt, capturing the end timestamp ($T_{end}$) with nanosecond-level precision.
 5. **Calculation:** The software subtracts the timestamps to find the duration ($\tau = T_{end} - T_{start}$). Knowing the exact resistance value ($R$), the system calculates the capacitance value in microfarads ($\mu\text{F}$) or nanofarads ($\text{nF}$).
 
+
+### 1.3 Schematic Diagram
+
+<img width="892" height="680" alt="{DAEABD75-1869-45BB-8C9D-1E05A484DCDB}" src="https://github.com/user-attachments/assets/b1f4d2f5-864e-4682-a477-f1276eb7b927" />
+
 ---
 
 ## 2. Leakage Current Measurement Principle
