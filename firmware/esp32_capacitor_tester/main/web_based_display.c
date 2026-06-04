@@ -103,7 +103,7 @@ static esp_err_t data_stream_handler(httpd_req_t *req) {
     httpd_resp_set_type(req, "text/plain");
     
     char chunk_buffer[32];
-    ESP_LOGI(TAG, "Stream data aktif untuk satu klien.");
+    ESP_LOGI(TAG, "Data stream is active for one client.");
 
     while (true) {
         uint32_t measurement = get_capacitor_measurement();
@@ -131,7 +131,7 @@ static esp_err_t data_stream_handler(httpd_req_t *req) {
 
 // --- REGISTRASI URL PATH ---
 
-// Mengarah ke halaman utama root (http://IP_ESP32/)
+// Point to root page (http://IP_ESP32/)
 static const httpd_uri_t index_uri = {
     .uri       = "/",
     .method    = HTTP_GET,
@@ -139,7 +139,7 @@ static const httpd_uri_t index_uri = {
     .user_ctx  = NULL
 };
 
-// Mengarah ke penyuplai data latar belakang (http://IP_ESP32/data)
+// Point to background data server (http://IP_ESP32/data)
 static const httpd_uri_t data_uri = {
     .uri       = "/data",
     .method    = HTTP_GET,
@@ -147,19 +147,19 @@ static const httpd_uri_t data_uri = {
     .user_ctx  = NULL
 };
 
-// 3. Fungsi Memulai Server Web
+// 3. Start Web function
 httpd_handle_t start_web_server(void) {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     httpd_handle_t server = NULL;
 
-    ESP_LOGI(TAG, "Menjalankan server modern pada port: '%d'", config.server_port);
+    ESP_LOGI(TAG, "Establishing modern server at PORT: '%d'", config.server_port);
     if (httpd_start(&server, &config) == ESP_OK) {
-        // Daftarkan kedua URL agar saling bekerja sama
+        // Register both URL to work together
         httpd_register_uri_handler(server, &index_uri);
         httpd_register_uri_handler(server, &data_uri);
         return server;
     }
 
-    ESP_LOGE(TAG, "Gagal mengaktifkan komponen server!");
+    ESP_LOGE(TAG, "Server failed to be established!");
     return NULL;
 }
