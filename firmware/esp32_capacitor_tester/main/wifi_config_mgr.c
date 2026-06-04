@@ -15,14 +15,14 @@
 #define NVS_NAMESPACE "wifi_store"
 #define NVS_KEY_CONFIG "wifi_cfg"
 
-#define AP_SSID "ESP32_Config_AP"
+#define AP_SSID "CAP_TEST_Config"
 #define AP_PASS "12345678"
 #define MAX_SCAN_AP 15
 
 #define BOOT_BUTTON_PIN GPIO_NUM_0
 #define DEBOUNCE_DELAY_MS 3000
 
-static const char *TAG = "WIFI_MGR";
+static const char *TAG = "WiFi Config";
 
 /* ====================================================================
    1. STORAGE MANAGEMENT(NVS)
@@ -260,9 +260,7 @@ void wifi_manager_init(void)
     init_nvs_storage();
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-
     bool force_ap = check_force_factory_reset();
-
     wifi_stored_config_t stored_wifi;
     bool has_config = load_wifi_credentials(&stored_wifi);
 
