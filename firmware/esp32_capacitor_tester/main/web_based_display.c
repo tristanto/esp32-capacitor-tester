@@ -7,12 +7,12 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-static const char *TAG = "web_display";
+static const char *TAG = "Web_Display";
 
 // Fungsi eksternal dari modul hardware kapasitor Anda
 extern uint32_t get_capacitor_measurement(void); 
 
-// --- KODE HTML, CSS & JAVASCRIPT YANG AKAN DIKIRIM KE BROWSER ---
+// --- HTML, CSS & JAVASCRIPT TO BE SENT TO THE BROWSER ---
 static const char* html_page = 
 "<!DOCTYPE html>"
 "<html>"
@@ -42,7 +42,7 @@ static const char* html_page =
 "            <p class='value' id='cap-value'>0<span class='unit'>pF</span></p>"
 "        </div>"
 "        "
-"        <div id='status-indicator' class='status disconnected'>Menghubungkan...</div>"
+"        <div id='status-indicator' class='status disconnected'>Connecting...</div>"
 "    </div>"
 ""
 "    <script>"
@@ -57,7 +57,7 @@ static const char* html_page =
 "                const reader = response.body.getReader();"
 "                const decoder = new TextDecoder();"
 "                "
-"                statusEl.innerText = 'TERHUBUNG';"
+"                statusEl.innerText = 'CONNECTED';"
 "                statusEl.className = 'status connected';"
 "                "
 "                let buffer = '';"
@@ -79,26 +79,26 @@ static const char* html_page =
 "                }"
 "            } catch (error) {"
 "                console.error(error);"
-"                statusEl.innerText = 'TERPUTUS';"
+"                statusEl.innerText = 'DISCONNECTED';"
 "                statusEl.className = 'status disconnected';"
-"                // Coba hubungkan kembali setelah 2 detik jika gagal"
+"                // Retry to connect after 2 minutes"
 "                setTimeout(startStream, 2000); "
 "            }"
 "        }"
 "        "
-"        // Mulai streaming saat halaman selesai dimuat"
+"        // Start streaming after page loaded successfully"
 "        window.onload = startStream;"
 "    </script>"
 "</body>"
 "</html>";
 
-// 1. Handler Utama untuk memuat Tampilan Dashboard (HTML)
+// 1. Main handler for dashboard view(HTML)
 static esp_err_t index_html_handler(httpd_req_t *req) {
     httpd_resp_set_type(req, "text/html; charset=utf-8");
     return httpd_resp_send(req, html_page, HTTPD_RESP_USE_STRLEN);
 }
 
-// 2. Handler Khusus Pengiriman Angka Pengukuran (HTTP Chunked Data Stream)
+// 2. Maesurement value stream handler (HTTP Chunked Data Stream)
 static esp_err_t data_stream_handler(httpd_req_t *req) {
     httpd_resp_set_type(req, "text/plain");
     
