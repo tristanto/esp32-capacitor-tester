@@ -21,6 +21,10 @@ bool load_wifi_credentials(wifi_stored_config_t *config);
 void save_wifi_credentials(const char *ssid, const char *password);
 void clear_wifi_credentials(void);
 void wifi_manager_init(void);
+
+
+
+
 #ifdef __cplusplus
 }
 #endif

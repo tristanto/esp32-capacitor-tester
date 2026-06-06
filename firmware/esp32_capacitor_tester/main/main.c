@@ -18,6 +18,8 @@
 #include "driver/uart.h"
 #include "web_based_display.h"
 #include "wifi_config_mgr.h"
+
+extern bool wifi_is_connected;
 static const char *TAG = "CAP_METER_V1.0";
 // ADC configuration parameters
 #define ADC_UNIT ADC_UNIT_1
@@ -29,6 +31,7 @@ static const char *TAG = "CAP_METER_V1.0";
 #define PIN_COMP_OUT GPIO_NUM_19 // Terhubung ke Output LM393
 #define RESISTOR_VAL 10000.0     // Resistor pengisi 10k Ohm
 
+uint32_t count = 0;
 volatile uint32_t timestamp_start = 0;
 volatile uint32_t timestamp_end = 0;
 volatile bool capture_done = false;
@@ -64,7 +67,10 @@ static bool IRAM_ATTR on_capture_reached(mcpwm_cap_channel_handle_t cap_chan, co
     // Kembalikan false karena kita tidak membangunkan task prioritas tinggi di dalam ISR ini
     return false;
 }
-
+// uint32_t get_capacitor_measurement()
+// {
+//     return count;
+// }
 static void GPIO_charge_init()
 {
     gpio_reset_pin(PIN_CHARGE);
@@ -160,14 +166,18 @@ void measurement_setup()
 void app_main(void)
 {
     GPIO_charge_init();
-    //uart_setup();
-    uint32_t count = 0;
- //   adc_continuous_handle_t adc_handle;
-  //  adc_continuous_init(&adc_handle);
-  //  measurement_setup();
-   // xTaskCreate(task_read_adc, "ADC Reader", 2048, NULL, 10, NULL);
+    // uart_setup();
+
+    //   adc_continuous_handle_t adc_handle;
+    //  adc_continuous_init(&adc_handle);
+    //  measurement_setup();
+    // xTaskCreate(task_read_adc, "ADC Reader", 2048, NULL, 10, NULL);
 
     wifi_manager_init();
+    if (wifi_is_connected)
+    {
+        start_web_server();
+    }
     while (1)
     {
         // if (capture_done)
@@ -183,7 +193,8 @@ void app_main(void)
         //     start_capacitor_measurement(); // Reset untuk pengukuran berikutnya
         // }
 
-        //taskYIELD(); // Yield to other tasks (like ADC reading task)
-        vTaskDelay(pdMS_TO_TICKS(100)); // Tambahkan sedikit delay untuk menghindari loop yang terlalu cepat    
+        // taskYIELD(); // Yield to other tasks (like ADC reading task)
+        count++;
+        vTaskDelay(pdMS_TO_TICKS(100)); // Tambahkan sedikit delay untuk menghindari loop yang terlalu cepat
     }
 }

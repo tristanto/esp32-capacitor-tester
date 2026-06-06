@@ -22,6 +22,9 @@
 #define BOOT_BUTTON_PIN GPIO_NUM_0
 #define DEBOUNCE_DELAY_MS 3000
 
+bool wifi_is_connected;
+char wifi_ip_address[16] = "0.0.0.0";
+
 static const char *TAG = "WiFi_Config";
 
 /* ====================================================================
@@ -167,18 +170,6 @@ static void start_config_webserver(void)
     {
         httpd_uri_t index_uri = {.uri = "/", .method = HTTP_GET, .handler = wifi_scan_get_handler};
         httpd_register_uri_handler(server, &index_uri);
-      // if (capture_done)
-        // {
-
-        //     // calculat the time to charge the capacitor using the captured timestamps
-        //     uint32_t cap_charge_time_us = timestamp_end - timestamp_start; // Karena timer MCPWM sudah diatur dengan resolusi 1us
-        //     ESP_LOGI(TAG, "Measurement %d: Time to charge capacitor = %u microseconds", count++, cap_charge_time_us);
-        //     double duration_sec = (double)cap_charge_time_us / (double)timer_resolution; // Konversi ke detik
-        //     // basic formula: C = t / R
-        //     double capacitance_uf = (duration_sec / RESISTOR_VAL) * 1000000.0;
-        //     ESP_LOGI(TAG, "Measurement %d: Capacitance = %.2f microfarads", count++, capacitance_uf);
-        //     start_capacitor_measurement(); // Reset untuk pengukuran berikutnya
-        // }
         httpd_uri_t save_uri = {.uri = "/save", .method = HTTP_POST, .handler = wifi_save_post_handler};
         httpd_register_uri_handler(server, &save_uri);
         ESP_LOGI(TAG, "Web Server aktif di http://192.168.4.1");
@@ -214,6 +205,42 @@ static void start_access_point_mode(void)
     start_config_webserver();
 }
 
+// Handler untuk memantau status koneksi fisik Wi-Fi
+static void wifi_event_handler(void *arg, esp_event_base_t event_base,
+                               int32_t event_id, void *event_data)
+{
+    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
+    {
+        ESP_LOGW(TAG, "Koneksi Wi-Fi terputus atau gagal terhubung!");
+
+        // Atur ke false karena perangkat tidak lagi memiliki koneksi aktif
+        wifi_is_connected = false;
+        strcpy(wifi_ip_address, "0.0.0.0");
+
+        // Auto-reconnect: Coba menghubungkan kembali secara otomatis ke router
+        esp_wifi_connect();
+    }
+}
+
+// Handler untuk menangkap saat router SELESAI memberikan Alamat IP via DHCP
+static void ip_event_handler(void *arg, esp_event_base_t event_base,
+                             int32_t event_id, void *event_data)
+{
+    if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
+    {
+        ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
+
+        // 1. Ambil alamat IP biner dan ubah menjadi teks string ("192.168.1.XX")
+        esp_ip4addr_ntoa(&event->ip_info.ip, wifi_ip_address, sizeof(wifi_ip_address));
+
+        ESP_LOGI(TAG, "--- KONEKSI SUKSES ---");
+        ESP_LOGI(TAG, "Mendapatkan Alamat IP: %s", wifi_ip_address);
+
+        // 2. DI SINI tempat yang benar untuk mengubah variabel menjadi true!
+        wifi_is_connected = true;
+    }
+}
+
 static void start_station_mode(wifi_stored_config_t *stored_cfg)
 {
     ESP_LOGI(TAG, "Starting client mode...");
@@ -231,7 +258,12 @@ static void start_station_mode(wifi_stored_config_t *stored_cfg)
     ESP_ERROR_CHECK(esp_wifi_start());
 
     ESP_LOGI(TAG, "Connecting to %s...", stored_cfg->ssid);
-    esp_wifi_connect();
+
+    esp_err_t ret = esp_wifi_connect();
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Gagal memerintahkan driver Wi-Fi untuk terhubung: %d", ret);
+    }
 }
 
 /* ====================================================================
@@ -274,6 +306,11 @@ void wifi_manager_init(void)
     init_nvs_storage();
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+    // WAJIB: Daftarkan kedua Event Handler di atas agar sistem mendengarkan status Wi-Fi & IP
+    ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_handler, NULL, NULL));
+
     bool force_ap = check_force_factory_reset();
     wifi_stored_config_t stored_wifi;
     bool has_config = load_wifi_credentials(&stored_wifi);

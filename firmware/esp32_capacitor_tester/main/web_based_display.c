@@ -10,7 +10,9 @@
 static const char *TAG = "Web_Display";
 
 // Fungsi eksternal dari modul hardware kapasitor Anda
-extern uint32_t get_capacitor_measurement(void); 
+uint32_t get_capacitor_measurement(void){
+    return 1000; // Placeholder, ganti dengan fungsi aktual yang mengembalikan nilai pengukuran kapasitor
+}
 
 // --- HTML, CSS & JAVASCRIPT TO BE SENT TO THE BROWSER ---
 static const char* html_page = 
@@ -152,7 +154,7 @@ httpd_handle_t start_web_server(void) {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     httpd_handle_t server = NULL;
 
-    ESP_LOGI(TAG, "Establishing modern server at PORT: '%d'", config.server_port);
+    ESP_LOGI(TAG, "Establishing modern server at PORT: '%d'", &config.server_port);
     if (httpd_start(&server, &config) == ESP_OK) {
         // Register both URL to work together
         httpd_register_uri_handler(server, &index_uri);
@@ -160,6 +162,6 @@ httpd_handle_t start_web_server(void) {
         return server;
     }
 
-    ESP_LOGE(TAG, "Server failed to be established!");
+    ESP_LOGE(TAG, "Server cannot be established!");
     return NULL;
 }
