@@ -22,7 +22,7 @@
 #define BOOT_BUTTON_PIN GPIO_NUM_0
 #define DEBOUNCE_DELAY_MS 3000
 
-static const char *TAG = "WiFi Config";
+static const char *TAG = "WiFi_Config";
 
 /* ====================================================================
    1. STORAGE MANAGEMENT(NVS)
@@ -91,6 +91,7 @@ void clear_wifi_credentials(void)
    ==================================================================== */
 static esp_err_t wifi_scan_get_handler(httpd_req_t *req)
 {
+    ESP_LOGI(TAG, "Received request for Wi-Fi configuration page.");
     httpd_resp_set_type(req, "text/html");
     httpd_resp_set_hdr(req, "Connection", "close");
 
@@ -99,7 +100,9 @@ static esp_err_t wifi_scan_get_handler(httpd_req_t *req)
 
     uint16_t ap_count = MAX_SCAN_AP;
     wifi_ap_record_t ap_records[MAX_SCAN_AP];
+    ESP_LOGI(TAG, "Scanning for Wi-Fi networks...");
     esp_wifi_scan_get_ap_records(&ap_count, ap_records);
+    ESP_LOGI(TAG, "Found %d access points.", ap_count);
 
     char buf[128];
     httpd_resp_send_chunk(req, "<html><body><h2>Konfigurasi Wi-Fi ESP32</h2>", HTTPD_RESP_USE_STRLEN);
@@ -164,7 +167,18 @@ static void start_config_webserver(void)
     {
         httpd_uri_t index_uri = {.uri = "/", .method = HTTP_GET, .handler = wifi_scan_get_handler};
         httpd_register_uri_handler(server, &index_uri);
+      // if (capture_done)
+        // {
 
+        //     // calculat the time to charge the capacitor using the captured timestamps
+        //     uint32_t cap_charge_time_us = timestamp_end - timestamp_start; // Karena timer MCPWM sudah diatur dengan resolusi 1us
+        //     ESP_LOGI(TAG, "Measurement %d: Time to charge capacitor = %u microseconds", count++, cap_charge_time_us);
+        //     double duration_sec = (double)cap_charge_time_us / (double)timer_resolution; // Konversi ke detik
+        //     // basic formula: C = t / R
+        //     double capacitance_uf = (duration_sec / RESISTOR_VAL) * 1000000.0;
+        //     ESP_LOGI(TAG, "Measurement %d: Capacitance = %.2f microfarads", count++, capacitance_uf);
+        //     start_capacitor_measurement(); // Reset untuk pengukuran berikutnya
+        // }
         httpd_uri_t save_uri = {.uri = "/save", .method = HTTP_POST, .handler = wifi_save_post_handler};
         httpd_register_uri_handler(server, &save_uri);
         ESP_LOGI(TAG, "Web Server aktif di http://192.168.4.1");
@@ -193,7 +207,7 @@ static void start_access_point_mode(void)
     if (strlen(AP_PASS) == 0)
         wifi_config.ap.authmode = WIFI_AUTH_OPEN;
 
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
 
@@ -266,10 +280,12 @@ void wifi_manager_init(void)
 
     if (force_ap || !has_config)
     {
+        ESP_LOGI(TAG, "No valid Wi-Fi configuration found. Starting in AP mode for setup.");
         start_access_point_mode();
     }
     else
     {
+        ESP_LOGI(TAG, "Valid Wi-Fi configuration found. Starting in Station mode.");
         start_station_mode(&stored_wifi);
     }
 }
